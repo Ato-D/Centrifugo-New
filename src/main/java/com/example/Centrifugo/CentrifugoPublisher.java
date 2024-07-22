@@ -24,9 +24,12 @@ public class CentrifugoPublisher {
 //    private ReminderRepository reminderRepository;
 
     public ResponseEntity<CentrifugalDto<?>> sendImmobilizationToCentrifugo(Object data, String topic) {
+        log.info("Pushing object -> {} to centrifugo topic -> {}",data,topic);
         final String API_KEY = centrifugo.getApiKey();
         final String CENTRIFUGO_URL = centrifugo.getUrl();
         final String CENTRIFUGO_METHOD = centrifugo.getMethod();
+
+        log.info("URL -> {}",CENTRIFUGO_URL);
 
         var params = new CentrifugalDto.Params<Object>();
         params.setChannel(topic);

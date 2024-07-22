@@ -1,9 +1,48 @@
+server:
+  port: 7300
+
+
+oauth:
+  path: http://192.168.250.209:8070
+  admin:
+    username: softadmin
+    password: "4rfv#EDC@"
+    client-id: security-admin-console
+  base-url: '${oauth.path}/auth'
+  realm: Push
+  authorization-grant-type: client_credentials
+  client:
+    id: push-messenger
+    name: push-messenger
+    secret: eca09a20-27db-4141-8976-33886e3eecf8
+
+
+
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/centrifugo
-    username: postgres
-    password: 12345
-    driver-class-name: org.postgresql.Driver
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://192.168.250.209:8070/auth/realms/Push
+
+      client:
+        registration:
+          keycloak:
+            provider: keycloak
+            authorization-grant-type: client_credentials
+            client-secret: eca09a20-27db-4141-8976-33886e3eecf8
+            client-id: push-messenger
+
+        provider:
+          keycloak:
+            issuer-uri: ${spring.security.oauth2.resource-server.jwt.issuer-uri}
+            jwk-set-uri: ${spring.security.oauth2.resource-server.jwt.issuer-uri}/protocol/openid-connect/certs
+            token-uri: ${spring.security.oauth2.resource-server.jwt.issuer-uri}/protocol/openid-connect/token
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -13,22 +52,29 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-    security:
-      user:
-        name: admin
-        password: admin
-
+  datasource:
+    url: jdbc:postgresql://192.168.250.209:5432/push_db
+    username: julius
+    password: julius123
+    hikari:
+      schema: centrifugo
+    driver-class-name: org.postgresql.Driver
 
 
 centrifugo:
   api-key: 65bcc0d4-3d68-455c-b6c1-168c8f20eb27
-  channel1: save
-  channel2: channel2
-  channel3: channel3
-#  deviceSummary: device-stat
+  channel1: downSites
+  channel2: pingStats
+  channel3: reminderChannel
+  deviceSummary: device-stat
   channel4: something2
+  channel5: save
   method: publish
   secret: DA8FD7E9A9F5DC952F03C6EBDC37BD91F39B28635722AC978438287CB929DB34D90B34A7F1421612181CC652932771A7F037A829C0B596BF7B8CE5528278783C
-  url: http://localhost:8000
-  websocket: ws://localhost:8000/connection/websocket
-#  wss://smpp.stlghana.com/connection/websocket
+  url: http://192.168.250.209:62000
+  websocket: wss://smpp.stlghana.com/connection/websocket
+
+
+
+
+
