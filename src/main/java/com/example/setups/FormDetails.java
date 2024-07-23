@@ -8,8 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.ManyToAny;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.ZonedDateTime;
@@ -40,7 +38,7 @@ public class FormDetails {
     private HashMap<String, Object> option = new HashMap<>();
 
     @Transient
-    private Map<String, String> keyValue = new HashMap<>();
+    private Map<Object, Object> keyValue = new HashMap<>();
 
     @CreationTimestamp
     @Column(name = "created_At")
@@ -53,8 +51,8 @@ public class FormDetails {
     @Column(name = "updated_At")
     private ZonedDateTime updatedAt = ZonedDateTime.now();
 
-    @ManyToMany(mappedBy = "form_details")
-      private List<FormDetail> formDetail;
+    @ManyToMany(mappedBy = "form")
+      private List<Form> form;
 
 
 }

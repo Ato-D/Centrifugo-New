@@ -1,6 +1,5 @@
 package com.example.setups;
 
-import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +9,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,8 +18,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "form_detail")
-public class FormDetail {
+@Table(name = "form")
+public class Form {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
@@ -33,7 +31,7 @@ public class FormDetail {
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(
             name = "FormDetails",
-            joinColumns = { @JoinColumn(name = "form_detail_id") },
+            joinColumns = { @JoinColumn(name = "form_id") },
             inverseJoinColumns = { @JoinColumn(name = "form_details_id") }
     )
     private List<FormDetails>  formDetails;
