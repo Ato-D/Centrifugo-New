@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DialectOverride;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.ZonedDateTime;
@@ -27,6 +28,9 @@ public class Form {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "version")
+    private int version = 1;
 
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(

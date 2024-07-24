@@ -21,6 +21,7 @@ public class FormDTO {
 
     private String name;
 
+    private int version;
 
     private List<FormDetails> formDetails;
 
