@@ -10,6 +10,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -113,11 +115,11 @@ public class MessageServiceImpl implements MessageService {
     public ResponseEntity<ResponseDTO> createMessage(MessageDto messageDto) {
         log.info("Inside the Save message method ::: Trying to save a message");
         ResponseDTO respose;
-
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
             log.info("MessageDto {}",messageDto);
             var message = MessageTable.builder()
-                    .senderId(messageDto.getSenderId())
+                    .senderId(getAuthenticatedUserId())
                     .receiverId(messageDto.getReceiverId())
                     .message(messageDto.getMessage())
                     .sender(messageDto.getSender())

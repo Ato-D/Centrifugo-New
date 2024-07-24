@@ -146,6 +146,7 @@ public class FormServiceImpl implements FormService {
                 }
             }
 
+            form.setVersion(formDTO.getVersion());
             form.setFormDetails(formDetailsList);
             form.setCreatedBy(getAuthenticatedUserId());
             form.setCreatedAt(ZonedDateTime.now());
@@ -177,51 +178,200 @@ public class FormServiceImpl implements FormService {
     }
 
 
+    /**
+     * Fetch the existing form from the repository using the provided id
+     * Check if the version in the request matches the version in the database
+     * Create a new Form instance to represent the updated version.
+     * Set the id to a new UUID to ensure a new record is created
+     * Copy the details from formDTO to the new form
+     * Retain the original creation time and creator information from the existing form
+     * Set the updatedAt field to the current time
+     * Increment the version number
+     */
     @Override
     public ResponseEntity<ResponseDTO> update(UUID id, FormDTO formDTO) {
         log.info("Inside Update Form :::: Trying to update Form -> {}", id);
         ResponseDTO response = new ResponseDTO();
 
         try {
-
             Form existingForm = formRepository.findById(id)
                     .orElseThrow(() ->
-                            new ResponseStatusException(HttpStatus.NOT_FOUND, "Existing Form Record " + id + "does not exixt"));
+                            new ResponseStatusException(HttpStatus.NOT_FOUND, "Existing Form Record " + id + " does not exist"));
 
             // Check if the version in the request matches the version in the database
-
             if (formDTO.getVersion() != existingForm.getVersion()) {
                 log.error("Form version mismatch detected for Form ID -> {}. Request Version -> {}, Existing Version -> {}",
                         id, formDTO.getVersion(), existingForm.getVersion());
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Form version mismatch");
-
             }
-            existingForm.setName(formDTO.getName());
-            existingForm.setFormDetails(formDTO.getFormDetails());
-            existingForm.setCreatedBy(getAuthenticatedUserId());
-            existingForm.setCreatedAt(ZonedDateTime.now());
-            existingForm.setUpdatedAt(ZonedDateTime.now());
 
+            Form newForm = new Form();
+            newForm.setId(UUID.randomUUID());
+            newForm.setName(formDTO.getName());
+            newForm.setFormDetails(formDTO.getFormDetails());
+            newForm.setCreatedBy(existingForm.getCreatedBy());
+            newForm.setCreatedAt(existingForm.getCreatedAt());
+            newForm.setUpdatedAt(ZonedDateTime.now());
+            newForm.setVersion(existingForm.getVersion() + 1);
 
-            existingForm.setVersion(existingForm.getVersion() + 1);
-
-            var record = formRepository.save(existingForm);
-            response = getResponseDTO("Record Updated Successfully", HttpStatus.ACCEPTED, record);
+            Form savedForm = formRepository.save(newForm);
+            response = getResponseDTO("Record Updated Successfully", HttpStatus.ACCEPTED, savedForm);
         } catch (ResponseStatusException e) {
-            log.error("Exception Occured! statusCode -> {} and Message -> {} and Reason -> {}", e.getStatusCode(), e.getMessage(), e.getReason());
+            log.error("Exception Occurred! statusCode -> {} and Message -> {} and Reason -> {}", e.getStatusCode(), e.getMessage(), e.getReason());
             response = getResponseDTO(e.getReason(), HttpStatus.valueOf(e.getStatusCode().value()));
         } catch (ObjectNotValidException e) {
             var message = String.join("\n", e.getErrorMessages());
-            log.info("Exception Occured! Reason -> {}", message);
+            log.info("Exception Occurred! Reason -> {}", message);
             response = getResponseDTO(message, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            log.error("Error Occured! statusCode -> {} and Cause -> {} and Message -> {}", 500, e.getCause(), e.getMessage());
+            log.error("Error Occurred! statusCode -> {} and Cause -> {} and Message -> {}", 500, e.getCause(), e.getMessage());
             response = getResponseDTO(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
     }
+//    public ResponseEntity<ResponseDTO> update(UUID id, FormDTO formDTO) {
+//        log.info("Inside Update Form :::: Trying to update Form -> {}", id);
+//        ResponseDTO response = new ResponseDTO();
+//
+//        try {
+//
+//            Form existingForm = formRepository.findById(id)
+//                    .orElseThrow(() ->
+//                            new ResponseStatusException(HttpStatus.NOT_FOUND, "Existing Form Record " + id + "does not exixt"));
+//
+//            // Check if the version in the request matches the version in the database
+//
+//            if (formDTO.getVersion() != existingForm.getVersion()) {
+//                log.error("Form version mismatch detected for Form ID -> {}. Request Version -> {}, Existing Version -> {}",
+//                        id, formDTO.getVersion(), existingForm.getVersion());
+//                throw new ResponseStatusException(HttpStatus.CONFLICT, "Form version mismatch");
+//
+//            }
+//            existingForm.setName(formDTO.getName());
+//            existingForm.setFormDetails(formDTO.getFormDetails());
+//            existingForm.setCreatedBy(getAuthenticatedUserId());
+//            existingForm.setCreatedAt(ZonedDateTime.now());
+//            existingForm.setUpdatedAt(ZonedDateTime.now());
+//
+//
+//            existingForm.setVersion(existingForm.getVersion() + 1);
+//
+//            var record = formRepository.save(existingForm);
+//            response = getResponseDTO("Record Updated Successfully", HttpStatus.ACCEPTED, record);
+//        } catch (ResponseStatusException e) {
+//            log.error("Exception Occured! statusCode -> {} and Message -> {} and Reason -> {}", e.getStatusCode(), e.getMessage(), e.getReason());
+//            response = getResponseDTO(e.getReason(), HttpStatus.valueOf(e.getStatusCode().value()));
+//        } catch (ObjectNotValidException e) {
+//            var message = String.join("\n", e.getErrorMessages());
+//            log.info("Exception Occured! Reason -> {}", message);
+//            response = getResponseDTO(message, HttpStatus.BAD_REQUEST);
+//        } catch (Exception e) {
+//            log.error("Error Occured! statusCode -> {} and Cause -> {} and Message -> {}", 500, e.getCause(), e.getMessage());
+//            response = getResponseDTO(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
+//    }
 
 }
+
+
+
+
+//    public ResponseEntity<ResponseDTO> update(UUID id, FormDTO formDTO) {
+//        log.info("Inside Update Form :::: Trying to update Form -> {}", id);
+//        ResponseDTO response = new ResponseDTO();
+//
+//        try {
+//            Form existingForm = formRepository.findById(id)
+//                    .orElseThrow(() ->
+//                            new ResponseStatusException(HttpStatus.NOT_FOUND, "Existing Form Record " + id + " does not exist"));
+//
+//            // Check if the version in the request matches the version in the database
+//            if (!formDTO.getVersion().equals(existingForm.getVersion())) {
+//                log.error("Form version mismatch detected for Form ID -> {}. Request Version -> {}, Existing Version -> {}",
+//                        id, formDTO.getVersion(), existingForm.getVersion());
+//                throw new ResponseStatusException(HttpStatus.CONFLICT, "Form version mismatch");
+//            }
+//
+//            Form newForm = new Form();
+//            newForm.setId(UUID.randomUUID()); // Generate a new UUID for the new form version
+//            newForm.setName(formDTO.getName());
+//            newForm.setFormDetails(formDTO.getFormDetails());
+//            newForm.setCreatedBy(existingForm.getCreatedBy()); // Keep the original creator
+//            newForm.setCreatedAt(existingForm.getCreatedAt()); // Keep the original creation time
+//            newForm.setUpdatedAt(ZonedDateTime.now());
+//            newForm.setVersion(existingForm.getVersion() + 1);
+//
+//            Form savedForm = formRepository.save(newForm);
+//            response = getResponseDTO("Record Updated Successfully", HttpStatus.ACCEPTED, savedForm);
+//        } catch (ResponseStatusException e) {
+//            log.error("Exception Occurred! statusCode -> {} and Message -> {} and Reason -> {}", e.getStatusCode(), e.getMessage(), e.getReason());
+//            response = getResponseDTO(e.getReason(), HttpStatus.valueOf(e.getStatusCode().value()));
+//        } catch (ObjectNotValidException e) {
+//            var message = String.join("\n", e.getErrorMessages());
+//            log.info("Exception Occurred! Reason -> {}", message);
+//            response = getResponseDTO(message, HttpStatus.BAD_REQUEST);
+//        } catch (Exception e) {
+//            log.error("Error Occurred! statusCode -> {} and Cause -> {} and Message -> {}", 500, e.getCause(), e.getMessage());
+//            response = getResponseDTO(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
+//    }
+
+
+//        Fetch the existing form from the repository using the provided id
+//        Create a new Form instance to represent the updated version.
+//        Set the id to a new UUID to ensure a new record is created.
+//        Copy the details from formDTO to the new form.
+//        Retain the original creation time and creator information from the existing form.
+//        Set the updatedAt field to the current time.
+//        Increment the version number.
+
+
+//    public ResponseEntity<ResponseDTO> update(UUID id, FormDTO formDTO) {
+//        log.info("Inside Update Form :::: Trying to update Form -> {}", id);
+//        ResponseDTO response = new ResponseDTO();
+//
+//        try {
+//            // Retrieve the existing form
+//            Form existingForm = formRepository.findById(id)
+//                    .orElseThrow(() ->
+//                            new ResponseStatusException(HttpStatus.NOT_FOUND, "Existing Form Record " + id + " does not exist"));
+//
+//            // Check if the version in the request matches the version in the database
+//            if (!formDTO.getVersion().equals(existingForm.getVersion())) {
+//                log.error("Form version mismatch detected for Form ID -> {}. Request Version -> {}, Existing Version -> {}",
+//                        id, formDTO.getVersion(), existingForm.getVersion());
+//                throw new ResponseStatusException(HttpStatus.CONFLICT, "Form version mismatch");
+//            }
+//
+//            // Create a new form record with updated details
+//            Form newForm = new Form();
+//            newForm.setId(UUID.randomUUID()); // Generate a new UUID for the new form version
+//            newForm.setName(formDTO.getName());
+//            newForm.setFormDetails(formDTO.getFormDetails());
+//            newForm.setCreatedBy(getAuthenticatedUserId());
+//            newForm.setCreatedAt(existingForm.getCreatedAt()); // Keep the original creation time
+//            newForm.setUpdatedAt(ZonedDateTime.now());
+//            newForm.setVersion(existingForm.getVersion() + 1);
+//
+//            // Save the new version of the form
+//            Form savedForm = formRepository.save(newForm);
+//            response = getResponseDTO("Record Updated Successfully", HttpStatus.ACCEPTED, savedForm);
+//        } catch (ResponseStatusException e) {
+//            log.error("Exception Occurred! statusCode -> {} and Message -> {} and Reason -> {}", e.getStatusCode(), e.getMessage(), e.getReason());
+//            response = getResponseDTO(e.getReason(), HttpStatus.valueOf(e.getStatusCode().value()));
+//        } catch (ObjectNotValidException e) {
+//            var message = String.join("\n", e.getErrorMessages());
+//            log.info("Exception Occurred! Reason -> {}", message);
+//            response = getResponseDTO(message, HttpStatus.BAD_REQUEST);
+//        } catch (Exception e) {
+//            log.error("Error Occurred! statusCode -> {} and Cause -> {} and Message -> {}", 500, e.getCause(), e.getMessage());
+//            response = getResponseDTO(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
+//    }
+
 
 
 //    public ResponseEntity<ResponseDTO> update(UUID id, FormDTO formDTO) {
