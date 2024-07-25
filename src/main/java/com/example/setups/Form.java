@@ -50,5 +50,4 @@ public class Form {
     @UpdateTimestamp
     @Column(name = "updated_At")
     private ZonedDateTime updatedAt = ZonedDateTime.now();
-
 }

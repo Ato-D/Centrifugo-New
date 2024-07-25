@@ -43,7 +43,7 @@ public class SecurityConfig {
 
 
 
-    public static final String CONTEXT_PATH = "api/v1/messages" ;
+    public static final String CONTEXT_PATH = "api/v1/messages";
     private static final String[] SWAGGER_ENDPOINTS = {
 
             "/", HttpMethod.GET.name(),

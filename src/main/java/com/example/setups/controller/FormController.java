@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.example.Centrifugo.config.SecurityConfig.CONTEXT_PATH;
 
 
 /**
@@ -31,7 +32,7 @@ import java.util.UUID;
  */
 
 @RestController
-@RequestMapping("api/v1/form")
+@RequestMapping(CONTEXT_PATH + "/form")
 @AllArgsConstructor
 @Slf4j
 
@@ -61,7 +62,7 @@ public class FormController {
     }
 
 
-    @PostMapping
+    @PostMapping("/create-form")
     public ResponseEntity<ResponseDTO> saveForm(@RequestBody FormDTO formDTO){
         return formService.saveForm(formDTO);
     }
