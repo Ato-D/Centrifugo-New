@@ -14,7 +14,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "table_message")
+@Table(name = "table_message", schema = "centrifugo")
 @Entity
 public class MessageTable {
 

@@ -1,11 +1,9 @@
 package com.example.Centrifugo.dto;
 
 
-import com.example.setups.FormDetails;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import com.example.Centrifugo.form.FormDetails;
+import lombok.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -28,6 +26,8 @@ public class FormDTO {
     private ZonedDateTime createdAt = ZonedDateTime.now();
 
     private UUID createdBy;
+
+    private UUID updatedBy;
 
     private ZonedDateTime updatedAt = ZonedDateTime.now();
 

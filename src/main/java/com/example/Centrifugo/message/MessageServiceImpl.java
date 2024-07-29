@@ -153,6 +153,7 @@ public class MessageServiceImpl implements MessageService {
         return new ResponseEntity<>(respose, HttpStatus.valueOf(respose.getStatusCode()));
     }
 
+
     /**
      * The method performs the update of message
      * @param id the id of the message to be updated
@@ -254,5 +255,36 @@ public class MessageServiceImpl implements MessageService {
 
         return messageDto;
     }
+
+
+    //    public ResponseEntity<ResponseDTO> createMessage(MessageDto messageDto) {
+//        log.info("Inside the Save message method ::: Trying to save a message");
+//        ResponseDTO response;
+//
+//        try {
+//            log.info("MessageDto {}", messageDto);
+//            UUID senderId = getAuthenticatedUserId();
+//            var message = MessageTable.builder()
+//                    .senderId(senderId)
+//                    .receiverId(messageDto.getReceiverId())
+//                    .message(messageDto.getMessage())
+//                    .sender(messageDto.getSender())
+//                    .receiver(messageDto.getReceiver())
+//                    .createdAt(ZonedDateTime.now())
+//                    .build();
+//            var record = messageRepository.save(message);
+//            log.info("Saved record -> {}", record);
+//
+//            String channel = createChannelName(senderId, messageDto.getReceiverId());
+//            centrifugoPublisher.sendToChannel(channel, record);
+//
+//            response = new ResponseDTO("Message saved and sent to channel: " + channel, 200);
+//        } catch (Exception e) {
+//            log.error("Error saving message", e);
+//            response = new ResponseDTO("Error saving message", 500);
+//        }
+//
+//        return ResponseEntity.ok(response);
+//    }
 }
 

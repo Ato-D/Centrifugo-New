@@ -1,4 +1,4 @@
-package com.example.setups.service;
+package com.example.Centrifugo.form.service;
 
 import com.example.Centrifugo.dto.FormDTO;
 import com.example.Centrifugo.dto.ResponseDTO;

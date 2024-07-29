@@ -55,7 +55,7 @@ public class MessageController {
 
 
     /**
-     *  the MessageController class handles incoming requests to send and retrieve messages.
+     *  the FormController1 class handles incoming requests to send and retrieve messages.
      *  The sendMessage method takes a Message object as a request body, and passes it to the MessageService to handle the business logic of sending the message.
      *  The getMessages method takes a recipientId as a path variable, and passes it to the MessageService to retrieve the messages for that recipient.
      * @param messageDto the object to be sent

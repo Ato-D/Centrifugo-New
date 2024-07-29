@@ -1,6 +1,7 @@
-package com.example.setups.repository;
+package com.example.Centrifugo.form.repository;
 
-import com.example.setups.Form;
+
+import com.example.Centrifugo.form.Form;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;

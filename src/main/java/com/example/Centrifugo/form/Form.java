@@ -1,10 +1,10 @@
-package com.example.setups;
+package com.example.Centrifugo.form;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DialectOverride;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -14,12 +14,16 @@ import java.util.List;
 import java.util.UUID;
 
 
-@Entity
+
+
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @Builder
-@Table(name = "form")
+@Table(name = "form", schema = "centrifugo")
+@Entity
 public class Form {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,13 +36,15 @@ public class Form {
     @Column(name = "version")
     private int version = 1;
 
-    @ManyToMany(cascade = {CascadeType.ALL})
+    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinTable(
-            name = "FormDetails",
-            joinColumns = { @JoinColumn(name = "form_id") },
-            inverseJoinColumns = { @JoinColumn(name = "form_details_id") }
+            name = "form_form_details",
+            joinColumns = {@JoinColumn(name = "form_id")},
+            inverseJoinColumns = {@JoinColumn(name = "form_details_id")}
     )
-    private List<FormDetails>  formDetails;
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
+    @ToString.Exclude
+    private List<FormDetails> formDetails;
 
     @CreationTimestamp
     @Column(name = "created_At")
@@ -47,7 +53,13 @@ public class Form {
     @Column(name = "created_by", nullable = false)
     private UUID createdBy;
 
+    @Column(name = "updated_by", nullable = false)
+    private UUID updatedBy;
+
     @UpdateTimestamp
     @Column(name = "updated_At")
     private ZonedDateTime updatedAt = ZonedDateTime.now();
+
+
+
 }

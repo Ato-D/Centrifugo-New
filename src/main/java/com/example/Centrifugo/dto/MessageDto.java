@@ -25,4 +25,6 @@ public class MessageDto {
     private String receiver;
 
     private String sender;
+
+    private String channel;
 }

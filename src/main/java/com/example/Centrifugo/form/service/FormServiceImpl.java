@@ -1,13 +1,13 @@
-package com.example.setups.service;
+package com.example.Centrifugo.form.service;
 
 
 import com.example.Centrifugo.dto.FormDTO;
 import com.example.Centrifugo.dto.FormDetailsDTO;
 import com.example.Centrifugo.dto.ResponseDTO;
+import com.example.Centrifugo.form.Form;
+import com.example.Centrifugo.form.FormDetails;
+import com.example.Centrifugo.form.repository.FormRepository;
 import com.example.Centrifugo.utility.ObjectNotValidException;
-import com.example.setups.Form;
-import com.example.setups.FormDetails;
-import com.example.setups.repository.FormRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -19,12 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.example.Centrifugo.utility.AppUtils.*;
 
@@ -43,7 +39,8 @@ public class FormServiceImpl implements FormService {
         ResponseDTO response;
 
         try {
-            List<Form> forms = formRepository.findAll();
+            List<Form> forms;
+           forms  = formRepository.findAll();
             if (!forms.isEmpty()) {
                 log.info("Success! statusCode -> {} and Message -> {}", HttpStatus.OK, forms);
                 List<FormDTO> formDTOList = forms.stream()
@@ -57,14 +54,16 @@ public class FormServiceImpl implements FormService {
                                             .label(detail.getLabel())
                                             .keyValue(detail.getKeyValue())
                                             .inputType(detail.getInputType())
-                                            .createdAt(ZonedDateTime.now())
                                             .createdBy(detail.getCreatedBy())
+                                            .createdAt(ZonedDateTime.now())
+                                            .updatedBy(getAuthenticatedUserId())
                                             .updatedAt(ZonedDateTime.now())
-                                            .option(detail.getOption())
+//                                            .option(detail.getOption())
                                             .build())
                                     .collect(Collectors.toList()));
                             formDTO.setCreatedAt(ZonedDateTime.now());
                             formDTO.setCreatedBy(form.getCreatedBy());
+                            formDTO.setUpdatedBy(getAuthenticatedUserId());
                             formDTO.setUpdatedAt(ZonedDateTime.now());
                             return formDTO;
                         })
@@ -138,10 +137,12 @@ public class FormServiceImpl implements FormService {
                     FormDetails formDetails = new FormDetails();
                     formDetails.setLabel(details.getLabel());
                     formDetails.setInputType(details.getInputType());
-                    formDetails.setOption(details.getOption());
+//                    formDetails.setOption(details.getOption());
                     formDetails.setKeyValue(details.getKeyValue());
                     formDetails.setCreatedAt(ZonedDateTime.now());
                     formDetails.setCreatedBy(getAuthenticatedUserId());
+                    formDetails.setUpdatedBy(getAuthenticatedUserId());
+                    formDetails.setUpdatedAt(ZonedDateTime.now());
                     formDetailsList.add(formDetails);
                 }
             }
@@ -150,8 +151,14 @@ public class FormServiceImpl implements FormService {
             form.setFormDetails(formDetailsList);
             form.setCreatedBy(getAuthenticatedUserId());
             form.setCreatedAt(ZonedDateTime.now());
+            form.setUpdatedBy(getAuthenticatedUserId());
             form.setUpdatedAt(ZonedDateTime.now());
-            form.setCreatedBy(getAuthenticatedUserId());
+
+            // Set the forms in each form detail to maintain the bidirectional relationship
+            for (FormDetails formDetails : formDetailsList) {
+                formDetails.setForm(Collections.singletonList(form));
+            }
+
 
             var record = formRepository.save(form);
             log.info("Saved record -> {}", record);
@@ -160,15 +167,15 @@ public class FormServiceImpl implements FormService {
             respose = getResponseDTO("Record Saved Successfully", HttpStatus.OK, record);
 
         } catch (ResponseStatusException e) {
-            log.error("Error Occured! statusCode -> {}, Message -> {}, Reason -> {}", e.getStatusCode(), e.getMessage(), e.getReason());
+            log.error("Error Occurred! statusCode -> {}, Message -> {}, Reason -> {}", e.getStatusCode(), e.getMessage(), e.getReason());
             respose = getResponseDTO(e.getReason(), HttpStatus.valueOf(e.getStatusCode().value()));
         } catch (ObjectNotValidException e) {
             var message = String.join("\n", e.getErrorMessages());
-            log.info("Exception Occured! Reason -> {}", message);
+            log.info("Exception Occurred! Reason -> {}", message);
             respose = getResponseDTO(message, HttpStatus.BAD_REQUEST);
 
         } catch (DataIntegrityViolationException e) {
-            log.error("Exception Occured! Message -> {} and Cause -> {}", e.getMostSpecificCause(), e.getMessage());
+            log.error("Exception Occurred! Message -> {} and Cause -> {}", e.getMostSpecificCause(), e.getMessage());
             respose = getResponseDTO(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             log.error("Exception Occured! statusCode -> {} and Cause -> {} and Message -> {}", 500, e.getCause(), e.getMessage());
@@ -209,8 +216,9 @@ public class FormServiceImpl implements FormService {
             newForm.setId(UUID.randomUUID());
             newForm.setName(formDTO.getName());
             newForm.setFormDetails(formDTO.getFormDetails());
-            newForm.setCreatedBy(existingForm.getCreatedBy());
+            newForm.setCreatedBy(getAuthenticatedUserId());
             newForm.setCreatedAt(existingForm.getCreatedAt());
+            newForm.setUpdatedBy(getAuthenticatedUserId());
             newForm.setUpdatedAt(ZonedDateTime.now());
             newForm.setVersion(existingForm.getVersion() + 1);
 

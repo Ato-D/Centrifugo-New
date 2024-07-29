@@ -1,10 +1,10 @@
-package com.example.setups.controller;
+package com.example.Centrifugo.form.controller;
 
 
 import com.example.Centrifugo.dto.FormDTO;
 import com.example.Centrifugo.dto.ResponseDTO;
-import com.example.setups.service.FormService;
-import com.example.setups.service.FormServiceImpl;
+
+import com.example.Centrifugo.form.service.FormService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +30,11 @@ import static com.example.Centrifugo.config.SecurityConfig.CONTEXT_PATH;
  * @modifiedAt
  * @modifiedBy
  */
-
+@CrossOrigin
 @RestController
-@RequestMapping(CONTEXT_PATH + "/form")
+@RequestMapping(CONTEXT_PATH)
 @AllArgsConstructor
 @Slf4j
-
 public class FormController {
 
     private final FormService formService;
@@ -43,8 +42,10 @@ public class FormController {
     /**
      * Handles a GET request to retrieve all forms.
      *
-     * @return ResponseEntity containing the ResponseDTO with the list of forms.     */
-    @GetMapping
+     * @return ResponseEntity containing the ResponseDTO with the list of forms.
+     *
+     */
+    @GetMapping("/findAllForms")
     public ResponseEntity<ResponseDTO> getAllForms(@RequestParam(defaultValue = "{}")Map<String, String> params) {
         return formService.findAllForms(params);
     }
@@ -56,7 +57,7 @@ public class FormController {
      * @param id The ID of the form to retrieve.
      * @return ResponseEntity containing the ResponseDTO with the requested form.
      */
-    @GetMapping("/{id}")
+    @GetMapping("form/{id}")
     public ResponseEntity<ResponseDTO> getFormById(@PathVariable UUID id){
         return formService.findById(id);
     }
@@ -82,4 +83,4 @@ public class FormController {
     }
 
 
-    }
+}
