@@ -52,7 +52,9 @@ public class FormServiceImpl implements FormService {
                                     .map(detail -> FormDetails.builder()
                                             .id(detail.getId())
                                             .label(detail.getLabel())
-                                            .keyValue(detail.getKeyValue())
+                                            .key(detail.getKey())
+                                            .constraints(detail.getConstraints())
+                                            .option(detail.getOption())
                                             .inputType(detail.getInputType())
                                             .createdBy(detail.getCreatedBy())
                                             .createdAt(ZonedDateTime.now())
@@ -137,8 +139,9 @@ public class FormServiceImpl implements FormService {
                     FormDetails formDetails = new FormDetails();
                     formDetails.setLabel(details.getLabel());
                     formDetails.setInputType(details.getInputType());
-//                    formDetails.setOption(details.getOption());
-                    formDetails.setKeyValue(details.getKeyValue());
+                    formDetails.setConstraints(details.getConstraints());
+                    formDetails.setOption(details.getOption());
+                    formDetails.setKey(details.getKey());
                     formDetails.setCreatedAt(ZonedDateTime.now());
                     formDetails.setCreatedBy(getAuthenticatedUserId());
                     formDetails.setUpdatedBy(getAuthenticatedUserId());

@@ -1,5 +1,7 @@
 package com.example.Centrifugo.dto;
 
+import com.example.Centrifugo.enums.Constraints;
+import com.example.Centrifugo.enums.InputType;
 import com.example.Centrifugo.form.Form;
 import lombok.*;
 
@@ -20,11 +22,14 @@ public class FormDetailsDTO {
 
     private String label;
 
-    private String inputType;
+    private Map<String, Object> option;
 
-    private HashMap<String, Object> option = new HashMap<>();
 
-    private Map<Object, Object> keyValue = new HashMap<>();
+    private InputType inputType;
+
+    private Constraints constraints;
+
+    private String key;
 
     private ZonedDateTime createdAt = ZonedDateTime.now();
 

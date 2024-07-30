@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
+import org.apache.commons.lang3.builder.HashCodeExclude;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DialectOverride;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -33,6 +34,7 @@ public class Form {
     @Column(name = "name")
     private String name;
 
+    @Version
     @Column(name = "version")
     private int version = 1;
 
@@ -44,6 +46,7 @@ public class Form {
     )
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<FormDetails> formDetails;
 
     @CreationTimestamp
@@ -59,6 +62,16 @@ public class Form {
     @UpdateTimestamp
     @Column(name = "updated_At")
     private ZonedDateTime updatedAt = ZonedDateTime.now();
+
+
+
+
+//    label: Type
+//    options: [
+//    {"setup": "setup_types_category_id", "valueType": "ID"}
+//]
+//    inputType: "DROPDOWN"
+//    key: "typeId"
 
 
 
