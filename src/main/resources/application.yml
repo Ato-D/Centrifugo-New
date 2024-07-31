@@ -45,7 +45,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     open-in-view: true
     show-sql: true
     properties:

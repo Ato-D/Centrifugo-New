@@ -14,10 +14,6 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
-
-
-
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,9 +30,9 @@ public class Form {
     @Column(name = "name")
     private String name;
 
-    @Version
+//    @Version
     @Column(name = "version")
-    private int version = 1;
+    private int version;
 
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinTable(

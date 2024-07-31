@@ -76,7 +76,6 @@ public class FormController {
      * @param id The ID of the form to be updated.
      * @return ResponseEntity containing the ResponseDTO with the updated form.
      */
-
     @PutMapping({"/{id}"})
     public ResponseEntity<ResponseDTO> updateForm(@PathVariable(name = "id") UUID id, @RequestBody FormDTO formDTO) {
         return formService.update(id, formDTO);

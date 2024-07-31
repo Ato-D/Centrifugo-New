@@ -9,6 +9,7 @@ import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.apache.commons.lang3.builder.HashCodeExclude;
 import org.hibernate.annotations.CreationTimestamp;
 //import org.hibernate.annotations.TypeDef;
@@ -21,14 +22,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Table(name = "form_details", schema = "centrifugo")
 @Entity
-//@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class FormDetails {
 
     @Id
@@ -44,12 +43,6 @@ public class FormDetails {
     @org.hibernate.annotations.Type(JsonType.class)
     private Map<String, Object> option = new HashMap<>();
 
-//    @Column(name = "options")
-//    @org.hibernate.annotations.Type(JsonType.class)
-//    private HashMap<String, Object> options = new HashMap<>();
-
-
-
     private String key;
 
     @Enumerated(EnumType.STRING)
@@ -57,7 +50,6 @@ public class FormDetails {
 
     @ManyToMany(mappedBy = "formDetails", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
-//    @HashCodeExclude
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Form> form;
