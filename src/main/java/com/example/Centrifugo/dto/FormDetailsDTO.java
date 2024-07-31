@@ -1,12 +1,11 @@
 package com.example.Centrifugo.dto;
 
 import com.example.Centrifugo.enums.Constraints;
-import com.example.Centrifugo.enums.InputType;
+import com.example.Centrifugo.enums.FieldType;
 import com.example.Centrifugo.form.Form;
 import lombok.*;
 
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -20,12 +19,20 @@ public class FormDetailsDTO {
 
     private UUID id;
 
-    private String label;
+    private String fieldLabel;
 
-    private Map<String, Object> option;
+    private int index;
+
+    private Map<String, Object> fieldOptions;
+    
+    private Boolean isRequired;
+
+    private String defaultValue;
+
+    private String placeholder;
 
 
-    private InputType inputType;
+    private FieldType fieldType;
 
     private Constraints constraints;
 

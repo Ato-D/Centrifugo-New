@@ -1,19 +1,14 @@
 package com.example.Centrifugo.form;
 
 import com.example.Centrifugo.enums.Constraints;
-import com.example.Centrifugo.enums.InputType;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.example.Centrifugo.enums.FieldType;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.apache.commons.lang3.builder.HashCodeExclude;
 import org.hibernate.annotations.CreationTimestamp;
 //import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.ZonedDateTime;
@@ -34,14 +29,22 @@ public class FormDetails {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private String label;
+    private int index;
+
+    private String fieldLabel;
+
+    private Boolean isRequired;
+
+    private String defaultValue;
+
+    private String placeholder;
 
     @Enumerated(EnumType.STRING)
-    private InputType inputType;
+    private FieldType fieldType;
 
     @Column(name = "options", columnDefinition = "jsonb")
     @org.hibernate.annotations.Type(JsonType.class)
-    private Map<String, Object> option = new HashMap<>();
+    private Map<String, Object> fieldOptions = new HashMap<>();
 
     private String key;
 

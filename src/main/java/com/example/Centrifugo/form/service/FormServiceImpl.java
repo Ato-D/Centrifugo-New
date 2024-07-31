@@ -2,7 +2,6 @@ package com.example.Centrifugo.form.service;
 
 
 import com.example.Centrifugo.dto.FormDTO;
-import com.example.Centrifugo.dto.FormDetailsDTO;
 import com.example.Centrifugo.dto.ResponseDTO;
 import com.example.Centrifugo.form.Form;
 import com.example.Centrifugo.form.FormDetails;
@@ -55,11 +54,11 @@ public class FormServiceImpl implements FormService {
                             formDTO.setFormDetails(form.getFormDetails().stream()
                                     .map(detail -> FormDetails.builder()
                                             .id(detail.getId())
-                                            .label(detail.getLabel())
+                                            .fieldLabel(detail.getFieldLabel())
                                             .key(detail.getKey())
                                             .constraints(detail.getConstraints())
-                                            .option(detail.getOption())
-                                            .inputType(detail.getInputType())
+                                            .option(detail.getFieldOptions())
+                                            .inputType(detail.getFieldType())
                                             .createdBy(detail.getCreatedBy())
                                             .createdAt(ZonedDateTime.now())
                                             .updatedBy(getAuthenticatedUserId())
@@ -140,10 +139,10 @@ public class FormServiceImpl implements FormService {
 //            if (isNotNullOrEmpty(formDTO.getFormDetails())) {
 //                for (FormDetails details : formDTO.getFormDetails()) {
 //                    FormDetails formDetails = new FormDetails();
-//                    formDetails.setLabel(details.getLabel());
-//                    formDetails.setInputType(details.getInputType());
+//                    formDetails.setFieldLabel(details.getFieldLabel());
+//                    formDetails.setFieldType(details.getFieldType());
 //                    formDetails.setConstraints(details.getConstraints());
-//                    formDetails.setOption(details.getOption());
+//                    formDetails.setFieldOptions(details.getFieldOptions());
 //                    formDetails.setKey(details.getKey());
 //                    formDetails.setCreatedAt(ZonedDateTime.now());
 //                    formDetails.setCreatedBy(getAuthenticatedUserId());
@@ -211,10 +210,10 @@ public class FormServiceImpl implements FormService {
             if (isNotNullOrEmpty(formDTO.getFormDetails())) {
                 for (FormDetails details : formDTO.getFormDetails()) {
                     FormDetails formDetails = new FormDetails();
-                    formDetails.setLabel(details.getLabel());
-                    formDetails.setInputType(details.getInputType());
+                    formDetails.setFieldLabel(details.getFieldLabel());
+                    formDetails.setFieldType(details.getFieldType());
                     formDetails.setConstraints(details.getConstraints());
-                    formDetails.setOption(details.getOption());
+                    formDetails.setFieldOptions(details.getFieldOptions());
                     formDetails.setKey(details.getKey());
                     formDetails.setCreatedAt(ZonedDateTime.now());
                     formDetails.setCreatedBy(getAuthenticatedUserId());
@@ -294,9 +293,9 @@ public class FormServiceImpl implements FormService {
                     for (FormDetails formDetails : existingForm.getFormDetails()) {
                         FormDetails newFormDetails = new FormDetails();
                         newFormDetails.setId(UUID.randomUUID());
-                        newFormDetails.setLabel(formDetails.getLabel());
-                        newFormDetails.setInputType(formDetails.getInputType());
-                        newFormDetails.setOption(formDetails.getOption());
+                        newFormDetails.setFieldLabel(formDetails.getFieldLabel());
+                        newFormDetails.setFieldType(formDetails.getFieldType());
+                        newFormDetails.setFieldOptions(formDetails.getFieldOptions());
                         newFormDetails.setKey(formDetails.getKey());
                         newFormDetails.setConstraints(formDetails.getConstraints());
                         newFormDetails.setCreatedAt(ZonedDateTime.now());
@@ -582,9 +581,9 @@ public class FormServiceImpl implements FormService {
 //                    FormDetails formDetails = formDetailsRepository.findById(detailsDTO.getId())
 //                            .orElse(new FormDetails());
 //
-//                    formDetails.setLabel(detailsDTO.getLabel());
-//                    formDetails.setInputType(detailsDTO.getInputType());
-//                    formDetails.setOption(detailsDTO.getOption());
+//                    formDetails.setFieldLabel(detailsDTO.getFieldLabel());
+//                    formDetails.setFieldType(detailsDTO.getFieldType());
+//                    formDetails.setFieldOptions(detailsDTO.getFieldOptions());
 //                    formDetails.setKeyValue(detailsDTO.getKeyValue());
 //                    formDetails.setCreatedAt(detailsDTO.getCreatedAt() != null ? detailsDTO.getCreatedAt() : ZonedDateTime.now());
 //                    formDetails.setCreatedBy(detailsDTO.getCreatedBy() != null ? detailsDTO.getCreatedBy() : getAuthenticatedUserId());

@@ -1,6 +1,6 @@
 package com.example.Centrifugo.enums;
 
-public enum InputType {
+public enum FieldType {
 
     DROPDOWN,
     INPUT,

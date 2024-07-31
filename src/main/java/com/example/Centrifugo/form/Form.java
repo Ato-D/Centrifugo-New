@@ -66,7 +66,7 @@ public class Form {
 //    options: [
 //    {"setup": "setup_types_category_id", "valueType": "ID"}
 //]
-//    inputType: "DROPDOWN"
+//    fieldType: "DROPDOWN"
 //    key: "typeId"
 
 
