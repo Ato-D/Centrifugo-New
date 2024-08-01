@@ -3,6 +3,7 @@ package com.example.Centrifugo.dto;
 
 
 import com.example.Centrifugo.form.FormDetails;
+import jakarta.persistence.Column;
 import lombok.*;
 
 import java.time.ZonedDateTime;
@@ -22,6 +23,8 @@ public class FormDTO {
     private int version;
 
     private List<FormDetails> formDetails;
+
+    private Boolean isEnabled;
 
     private ZonedDateTime createdAt = ZonedDateTime.now();
 

@@ -30,7 +30,6 @@ public class Form {
     @Column(name = "name")
     private String name;
 
-//    @Version
     @Column(name = "version")
     private int version;
 
@@ -43,14 +42,18 @@ public class Form {
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @HashCodeExclude
     private List<FormDetails> formDetails;
+
+    @Column(name = "is_enabled")
+    private Boolean isEnabled;
+
+    @Column(name = "created_by", nullable = false)
+    private UUID createdBy;
 
     @CreationTimestamp
     @Column(name = "created_At")
     private ZonedDateTime createdAt = ZonedDateTime.now();
-
-    @Column(name = "created_by", nullable = false)
-    private UUID createdBy;
 
     @Column(name = "updated_by", nullable = false)
     private UUID updatedBy;

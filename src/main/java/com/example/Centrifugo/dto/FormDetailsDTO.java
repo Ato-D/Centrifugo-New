@@ -19,18 +19,17 @@ public class FormDetailsDTO {
 
     private UUID id;
 
-    private String fieldLabel;
-
     private int index;
 
+    private String fieldLabel;
+
     private Map<String, Object> fieldOptions;
-    
+
     private Boolean isRequired;
 
     private String defaultValue;
 
     private String placeholder;
-
 
     private FieldType fieldType;
 
@@ -38,15 +37,17 @@ public class FormDetailsDTO {
 
     private String key;
 
-    private ZonedDateTime createdAt = ZonedDateTime.now();
+    private List<Form> form;
 
     private UUID createdBy;
+
+    private ZonedDateTime createdAt = ZonedDateTime.now();
 
     private UUID updatedBy;
 
     private ZonedDateTime updatedAt = ZonedDateTime.now();
 
-    private List<Form> form;
+
 
 
 

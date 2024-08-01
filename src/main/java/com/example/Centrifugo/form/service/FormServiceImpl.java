@@ -51,22 +51,27 @@ public class FormServiceImpl implements FormService {
                             FormDTO formDTO = new FormDTO();
                             formDTO.setId(form.getId());
                             formDTO.setName(form.getName());
+                            formDTO.setIsEnabled(form.getIsEnabled());
                             formDTO.setFormDetails(form.getFormDetails().stream()
                                     .map(detail -> FormDetails.builder()
                                             .id(detail.getId())
+                                            .index(detail.getIndex())
                                             .fieldLabel(detail.getFieldLabel())
-                                            .key(detail.getKey())
+                                            .fieldOptions(detail.getFieldOptions())
+                                            .isRequired(detail.getIsRequired())
+                                            .defaultValue(detail.getDefaultValue())
+                                            .placeholder(detail.getPlaceholder())
+                                            .fieldType(detail.getFieldType())
                                             .constraints(detail.getConstraints())
-                                            .option(detail.getFieldOptions())
-                                            .inputType(detail.getFieldType())
+                                            .key(detail.getKey())
                                             .createdBy(detail.getCreatedBy())
                                             .createdAt(ZonedDateTime.now())
                                             .updatedBy(getAuthenticatedUserId())
                                             .updatedAt(ZonedDateTime.now())
                                             .build())
                                     .collect(Collectors.toList()));
-                            formDTO.setCreatedAt(ZonedDateTime.now());
                             formDTO.setCreatedBy(form.getCreatedBy());
+                            formDTO.setCreatedAt(ZonedDateTime.now());
                             formDTO.setUpdatedBy(getAuthenticatedUserId());
                             formDTO.setUpdatedAt(ZonedDateTime.now());
                             return formDTO;
@@ -128,6 +133,167 @@ public class FormServiceImpl implements FormService {
 
     @Override
     @Transactional
+    public ResponseEntity<ResponseDTO> saveForm(FormDTO formDTO) {
+        log.info("Inside the save form method ::: Trying to save a form");
+
+        ResponseDTO response;
+        try {
+            Form form = new Form();
+            form.setName(formDTO.getName());
+            form.setVersion(1);
+            form.setCreatedBy(getAuthenticatedUserId());
+            form.setCreatedAt(ZonedDateTime.now());
+            form.setUpdatedBy(getAuthenticatedUserId());
+            form.setUpdatedAt(ZonedDateTime.now());
+
+            List<FormDetails> formDetailsList = new ArrayList<>();
+
+            int indexCounter = 1;
+
+            if (isNotNullOrEmpty(formDTO.getFormDetails())) {
+                for (FormDetails details : formDTO.getFormDetails()) {
+
+                    try {
+                    int indexToCheck = indexCounter;
+                    boolean indexExists = formDetailsList.stream()
+                            .anyMatch(fd -> fd.getIndex() == indexToCheck);
+                    if (indexExists) {
+                        log.info("Duplicate index found: " + indexToCheck);
+                        throw new IllegalArgumentException("Duplicate index found: " + indexToCheck);
+                    }
+                    FormDetails formDetails = new FormDetails();
+                    formDetails.setIndex(details.getIndex());
+                    formDetails.setFieldLabel(details.getFieldLabel());
+                    formDetails.setFieldOptions(details.getFieldOptions());
+                    formDetails.setIsRequired(details.getIsRequired());
+                    formDetails.setDefaultValue(details.getDefaultValue());
+                    formDetails.setPlaceholder(details.getPlaceholder());
+                    formDetails.setFieldType(details.getFieldType());
+                    formDetails.setConstraints(details.getConstraints());
+                    formDetails.setKey(details.getKey());
+                    formDetails.setCreatedBy(getAuthenticatedUserId());
+                    formDetails.setCreatedAt(ZonedDateTime.now());
+                    formDetails.setUpdatedBy(getAuthenticatedUserId());
+                    formDetails.setUpdatedAt(ZonedDateTime.now());
+
+                    formDetailsList.add(formDetails);
+                    indexCounter++;
+
+                } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+            form.setFormDetails(formDetailsList);
+            for (FormDetails formDetails : formDetailsList) {
+                formDetails.setForm(Collections.singletonList(form));
+            }
+            var record = formRepository.save(form);
+            log.info("Saved record -> {}", record);
+
+            log.info("Success! statusCode -> {} and Message -> {}", HttpStatus.CREATED, record);
+            response = getResponseDTO("Record Saved Successfully", HttpStatus.OK, record);
+
+        } catch (ResponseStatusException e) {
+            log.error("Error Occurred! statusCode -> {}, Message -> {}, Reason -> {}", e.getStatusCode(), e.getMessage(), e.getReason());
+            response = getResponseDTO(e.getReason(), HttpStatus.valueOf(e.getStatusCode().value()));
+        } catch (ObjectNotValidException e) {
+            var message = String.join("\n", e.getErrorMessages());
+            log.info("Exception Occurred! Reason -> {}", message);
+            response = getResponseDTO(message, HttpStatus.BAD_REQUEST);
+
+        } catch (DataIntegrityViolationException e) {
+            log.error("Exception Occurred! Message -> {} and Cause -> {}", e.getMostSpecificCause(), e.getMessage());
+            response = getResponseDTO(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            log.error("Exception Occured! statusCode -> {} and Cause -> {} and Message -> {}", 500, e.getCause(), e.getMessage());
+            response = getResponseDTO(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
+
+    }
+
+
+            /**
+             * Fetch the existing form from the repository using the provided id
+             * Check if the version in the request matches the version in the database
+             * Create a new Form instance to represent the updated version.
+             * Set the id to a new UUID to ensure a new record is created
+             * Copy the details from formDTO to the new form
+             * Retain the original creation time and creator information from the existing form
+             * Set the updatedAt field to the current time
+             * Increment the version number
+             */
+
+
+            @Override
+            @Transactional
+            public ResponseEntity<ResponseDTO> update(UUID id, FormDTO formDTO) {
+                log.info("Inside Update Form :::: Trying to update Form -> {}", id);
+                ResponseDTO response;
+                try {
+                    Form existingForm = formRepository.findById(id)
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Form not found"));
+
+                    int currentVersion = existingForm.getVersion();
+                    System.out.println(currentVersion);
+                    int newVersion = currentVersion + 1;
+
+                    Form newForm = new Form();
+                    newForm.setId(UUID.randomUUID());
+                    newForm.setName(formDTO.getName());
+                    newForm.setIsEnabled(formDTO.getIsEnabled());
+                    newForm.setVersion(newVersion);
+                    newForm.setCreatedBy(getAuthenticatedUserId());
+                    newForm.setCreatedAt(ZonedDateTime.now());
+                    newForm.setUpdatedBy(getAuthenticatedUserId());
+                    newForm.setUpdatedAt(ZonedDateTime.now());
+
+                    // Copy form details
+                    List<FormDetails> newFormDetailsList = new ArrayList<>();
+                    for (FormDetails formDetails : existingForm.getFormDetails()) {
+                        FormDetails newFormDetails = new FormDetails();
+                        newFormDetails.setId(UUID.randomUUID());
+                        newFormDetails.setIndex(formDetails.getIndex());
+                        newFormDetails.setFieldLabel(formDetails.getFieldLabel());
+                        newFormDetails.setFieldOptions(formDetails.getFieldOptions());
+                        newFormDetails.setIsRequired(formDetails.getIsRequired());
+                        newFormDetails.setDefaultValue(formDetails.getDefaultValue());
+                        newFormDetails.setPlaceholder(formDetails.getPlaceholder());
+                        newFormDetails.setFieldType(formDetails.getFieldType());
+                        newFormDetails.setConstraints(formDetails.getConstraints());
+                        newFormDetails.setKey(formDetails.getKey());
+                        newFormDetails.setCreatedBy(getAuthenticatedUserId());
+                        newFormDetails.setCreatedAt(ZonedDateTime.now());
+                        newFormDetails.setUpdatedBy(getAuthenticatedUserId());
+                        newFormDetails.setUpdatedAt(ZonedDateTime.now());
+                        // Set the new form as the parent for form details
+                        newFormDetails.setForm(Collections.singletonList(newForm));
+
+                        newFormDetailsList.add(newFormDetails);
+                    }
+                    newForm.setFormDetails(newFormDetailsList);
+
+                    if (formDTO.getVersion() != existingForm.getVersion()) {
+                        log.error("Form version mismatch detected for Form ID -> {}. Request Version -> {}, Existing Version -> {}",
+                                id, formDTO.getVersion(), existingForm.getVersion());
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Form version mismatch");
+                    }
+
+                    Form savedForm = formRepository.save(newForm);
+                    response = getResponseDTO("Form updated successfully", HttpStatus.OK, savedForm);
+                } catch (ResponseStatusException e) {
+                    log.error("Exception Occurred! statusCode -> {} and Message -> {} and Reason -> {}", e.getStatusCode(), e.getMessage(), e.getReason());
+                    response = getResponseDTO(e.getReason(), HttpStatus.valueOf(e.getStatusCode().value()));
+                } catch (Exception e) {
+                    log.error("Error Occurred! statusCode -> {} and Cause -> {} and Message -> {}", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getCause(), e.getMessage());
+                    response = getResponseDTO(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+                return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
+            }
+
+    //    @Override
+//    @Transactional
 //    public ResponseEntity<ResponseDTO> saveForm(FormDTO formDTO) {
 //        log.info("Inside the save form method ::: Trying to save a form");
 //
@@ -190,143 +356,67 @@ public class FormServiceImpl implements FormService {
 //    }
 
 
-    public ResponseEntity<ResponseDTO> saveForm(FormDTO formDTO) {
-        log.info("Inside the save form method ::: Trying to save a form");
-
-        ResponseDTO response;
-        try {
-            Form form = new Form();
-            form.setName(formDTO.getName());
-            form.setVersion(1);
-            form.setCreatedBy(getAuthenticatedUserId());
-            form.setCreatedAt(ZonedDateTime.now());
-            form.setUpdatedBy(getAuthenticatedUserId());
-            form.setUpdatedAt(ZonedDateTime.now());
-
-            // Create list for FormDetails
-            List<FormDetails> formDetailsList = new ArrayList<>();
-
-            // Iterate through form details provided in the DTO
-            if (isNotNullOrEmpty(formDTO.getFormDetails())) {
-                for (FormDetails details : formDTO.getFormDetails()) {
-                    FormDetails formDetails = new FormDetails();
-                    formDetails.setFieldLabel(details.getFieldLabel());
-                    formDetails.setFieldType(details.getFieldType());
-                    formDetails.setConstraints(details.getConstraints());
-                    formDetails.setFieldOptions(details.getFieldOptions());
-                    formDetails.setKey(details.getKey());
-                    formDetails.setCreatedAt(ZonedDateTime.now());
-                    formDetails.setCreatedBy(getAuthenticatedUserId());
-                    formDetails.setUpdatedBy(getAuthenticatedUserId());
-                    formDetails.setUpdatedAt(ZonedDateTime.now());
-
-                    formDetailsList.add(formDetails);
-                }
-            }
-            form.setFormDetails(formDetailsList);
-            for (FormDetails formDetails : formDetailsList) {
-                formDetails.setForm(Collections.singletonList(form));
-            }
-            var record = formRepository.save(form);
-            log.info("Saved record -> {}", record);
-
-            log.info("Success! statusCode -> {} and Message -> {}", HttpStatus.CREATED, record);
-            response = getResponseDTO("Record Saved Successfully", HttpStatus.OK, record);
-
-        } catch (ResponseStatusException e) {
-            log.error("Error Occurred! statusCode -> {}, Message -> {}, Reason -> {}", e.getStatusCode(), e.getMessage(), e.getReason());
-            response = getResponseDTO(e.getReason(), HttpStatus.valueOf(e.getStatusCode().value()));
-        } catch (ObjectNotValidException e) {
-            var message = String.join("\n", e.getErrorMessages());
-            log.info("Exception Occurred! Reason -> {}", message);
-            response = getResponseDTO(message, HttpStatus.BAD_REQUEST);
-
-        } catch (DataIntegrityViolationException e) {
-            log.error("Exception Occurred! Message -> {} and Cause -> {}", e.getMostSpecificCause(), e.getMessage());
-            response = getResponseDTO(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            log.error("Exception Occured! statusCode -> {} and Cause -> {} and Message -> {}", 500, e.getCause(), e.getMessage());
-            response = getResponseDTO(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
-
-    }
 
 
-            /**
-             * Fetch the existing form from the repository using the provided id
-             * Check if the version in the request matches the version in the database
-             * Create a new Form instance to represent the updated version.
-             * Set the id to a new UUID to ensure a new record is created
-             * Copy the details from formDTO to the new form
-             * Retain the original creation time and creator information from the existing form
-             * Set the updatedAt field to the current time
-             * Increment the version number
-             */
+//    Form form = new Form();
+//form.setName(formDTO.getName());
+//form.setVersion(1);
+//form.setCreatedBy(getAuthenticatedUserId());
+//form.setCreatedAt(ZonedDateTime.now());
+//form.setUpdatedBy(getAuthenticatedUserId());
+//form.setUpdatedAt(ZonedDateTime.now());
+//
+//    // Create list for FormDetails
+//    List<FormDetails> formDetailsList = new ArrayList<>();
+//
+//    // Initialize an index counter
+//    int indexCounter = 1;
+//
+//// Iterate through form details provided in the DTO
+//if (isNotNullOrEmpty(formDTO.getFormDetails())) {
+//        for (FormDetails details : formDTO.getFormDetails()) {
+//            try {
+//                // Check if the index is already used
+//                int indexToCheck = indexCounter;
+//                boolean indexExists = formDetailsList.stream()
+//                        .anyMatch(fd -> fd.getIndex() == indexToCheck);
+//
+//                if (indexExists) {
+//                    throw new Exception("Duplicate index found: " + indexToCheck);
+//                }
+//
+//                // Create and set form details
+//                FormDetails formDetails = new FormDetails();
+//                formDetails.setIndex(indexCounter); // Assign a unique index
+//                formDetails.setFieldLabel(details.getFieldLabel());
+//                formDetails.setFieldOptions(details.getFieldOptions());
+//                formDetails.setIsRequired(details.getIsRequired());
+//                formDetails.setDefaultValue(details.getDefaultValue());
+//                formDetails.setPlaceholder(details.getPlaceholder());
+//                formDetails.setFieldType(details.getFieldType());
+//                formDetails.setConstraints(details.getConstraints());
+//                formDetails.setKey(details.getKey());
+//                formDetails.setCreatedBy(getAuthenticatedUserId());
+//                formDetails.setCreatedAt(ZonedDateTime.now());
+//                formDetails.setUpdatedBy(getAuthenticatedUserId());
+//                formDetails.setUpdatedAt(ZonedDateTime.now());
+//
+//                // Add to list if index is unique
+//                formDetailsList.add(formDetails);
+//                indexCounter++; // Increment the index counter for the next FormDetails
+//            } catch (Exception e) {
+//                // Handle duplicate index case or other exceptions
+//                System.out.println("Error: " + e.getMessage());
+//                // You may want to log this error or handle it in a more specific way
+//            }
+//        }
+//    }
+//
+//form.setFormDetails(formDetailsList);
+//for (FormDetails formDetails : formDetailsList) {
+//        formDetails.setForm(Collections.singletonList(form));
+//    }
 
-
-            @Override
-            @Transactional
-            public ResponseEntity<ResponseDTO> update(UUID id, FormDTO formDTO) {
-                log.info("Inside Update Form :::: Trying to update Form -> {}", id);
-                ResponseDTO response;
-                try {
-                    Form existingForm = formRepository.findById(id)
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Form not found"));
-
-                    int currentVersion = existingForm.getVersion();
-                    System.out.println(currentVersion);
-                    int newVersion = currentVersion + 1;
-
-                    Form newForm = new Form();
-                    newForm.setId(UUID.randomUUID());
-                    newForm.setName(formDTO.getName());
-                    newForm.setVersion(newVersion);
-                    System.out.println(newVersion);
-                    newForm.setCreatedBy(getAuthenticatedUserId());
-                    newForm.setCreatedAt(ZonedDateTime.now());
-                    newForm.setUpdatedBy(getAuthenticatedUserId());
-                    newForm.setUpdatedAt(ZonedDateTime.now());
-
-                    // Copy form details
-                    List<FormDetails> newFormDetailsList = new ArrayList<>();
-                    for (FormDetails formDetails : existingForm.getFormDetails()) {
-                        FormDetails newFormDetails = new FormDetails();
-                        newFormDetails.setId(UUID.randomUUID());
-                        newFormDetails.setFieldLabel(formDetails.getFieldLabel());
-                        newFormDetails.setFieldType(formDetails.getFieldType());
-                        newFormDetails.setFieldOptions(formDetails.getFieldOptions());
-                        newFormDetails.setKey(formDetails.getKey());
-                        newFormDetails.setConstraints(formDetails.getConstraints());
-                        newFormDetails.setCreatedAt(ZonedDateTime.now());
-                        newFormDetails.setCreatedBy(getAuthenticatedUserId());
-                        newFormDetails.setUpdatedBy(getAuthenticatedUserId());
-                        newFormDetails.setUpdatedAt(ZonedDateTime.now());
-
-                        // Set the new form as the parent for form details
-                        newFormDetails.setForm(Collections.singletonList(newForm));
-
-                        newFormDetailsList.add(newFormDetails);
-                    }
-                    newForm.setFormDetails(newFormDetailsList);
-
-                    if (formDTO.getVersion() != existingForm.getVersion()) {
-                        log.error("Form version mismatch detected for Form ID -> {}. Request Version -> {}, Existing Version -> {}",
-                                id, formDTO.getVersion(), existingForm.getVersion());
-                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Form version mismatch");
-                    }
-
-                    Form savedForm = formRepository.save(newForm);
-                    response = getResponseDTO("Form updated successfully", HttpStatus.OK, savedForm);
-                } catch (ResponseStatusException e) {
-                    log.error("Exception Occurred! statusCode -> {} and Message -> {} and Reason -> {}", e.getStatusCode(), e.getMessage(), e.getReason());
-                    response = getResponseDTO(e.getReason(), HttpStatus.valueOf(e.getStatusCode().value()));
-                } catch (Exception e) {
-                    log.error("Error Occurred! statusCode -> {} and Cause -> {} and Message -> {}", HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getCause(), e.getMessage());
-                    response = getResponseDTO(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-                return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
-            }
 
 
 //    @Override

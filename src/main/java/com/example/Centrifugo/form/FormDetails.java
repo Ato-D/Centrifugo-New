@@ -3,6 +3,7 @@ package com.example.Centrifugo.form;
 import com.example.Centrifugo.enums.Constraints;
 import com.example.Centrifugo.enums.FieldType;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
@@ -33,6 +34,10 @@ public class FormDetails {
 
     private String fieldLabel;
 
+    @Column(name = "options", columnDefinition = "jsonb")
+    @org.hibernate.annotations.Type(JsonType.class)
+    private Map<String, Object> fieldOptions = new HashMap<>();
+
     private Boolean isRequired;
 
     private String defaultValue;
@@ -42,27 +47,25 @@ public class FormDetails {
     @Enumerated(EnumType.STRING)
     private FieldType fieldType;
 
-    @Column(name = "options", columnDefinition = "jsonb")
-    @org.hibernate.annotations.Type(JsonType.class)
-    private Map<String, Object> fieldOptions = new HashMap<>();
-
-    private String key;
-
     @Enumerated(EnumType.STRING)
     private Constraints constraints;
 
+    private String key;
+
     @ManyToMany(mappedBy = "formDetails", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class , property = "id")
+    @JsonIgnore
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Form> form;
+
+    @Column(name = "created_by", nullable = false)
+    private UUID createdBy;
 
     @CreationTimestamp
     @Column(name = "created_At")
     private ZonedDateTime createdAt = ZonedDateTime.now();
 
-    @Column(name = "created_by", nullable = false)
-    private UUID createdBy;
 
     @Column(name = "updated_by", nullable = false)
     private UUID updatedBy;
