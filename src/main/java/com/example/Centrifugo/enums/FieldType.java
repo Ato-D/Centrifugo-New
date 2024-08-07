@@ -2,11 +2,15 @@ package com.example.Centrifugo.enums;
 
 public enum FieldType {
 
-    DROPDOWN,
-    INPUT,
-    CHECKBOX,
-    RADIO,
-    TEXTAREA
+    dropdown,
+    input,
+    checkbox,
+    radio,
+    textarea,
+    signature,
+    location,
+    image
+
 
 
 }

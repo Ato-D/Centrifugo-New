@@ -3,6 +3,7 @@ package com.example.Centrifugo.form.service;
 
 import com.example.Centrifugo.dto.FormDTO;
 import com.example.Centrifugo.dto.ResponseDTO;
+import com.example.Centrifugo.enums.Constraints;
 import com.example.Centrifugo.form.Form;
 import com.example.Centrifugo.form.FormDetails;
 import com.example.Centrifugo.form.repository.FormDetailsRepository;
@@ -36,6 +37,7 @@ public class FormServiceImpl implements FormService {
 
     private final ModelMapper modelMapper;
 
+
     @Override
     public ResponseEntity<ResponseDTO> findAllForms(Map<String, String> params) {
         log.info("Inside find All Forms :::::: Trying to fetch forms per given params");
@@ -43,7 +45,7 @@ public class FormServiceImpl implements FormService {
 
         try {
             List<Form> forms;
-           forms  = formRepository.findAll();
+            forms  = formRepository.findAll();
             if (!forms.isEmpty()) {
                 log.info("Success! statusCode -> {} and Message -> {}", HttpStatus.OK, forms);
                 List<FormDTO> formDTOList = forms.stream()
@@ -94,6 +96,79 @@ public class FormServiceImpl implements FormService {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+//    @Override
+//    public ResponseEntity<ResponseDTO> findAllForms(Map<String, String> params) {
+//        log.info("Inside find All Forms :::::: Trying to fetch forms per given params");
+//        ResponseDTO response;
+//
+//        try {
+//
+//
+//
+//
+//
+//
+//
+//
+//            List<Form> forms = formRepository.findAll();
+//            if (!forms.isEmpty()) {
+//                log.info("Success! statusCode -> {} and Message -> {}", HttpStatus.OK, forms);
+//                List<FormDTO> formDTOList = forms.stream()
+//                        .map(form -> {
+//                            FormDTO formDTO = new FormDTO();
+//                            formDTO.setId(form.getId());
+//                            formDTO.setName(form.getName());
+//                            formDTO.setIsEnabled(form.getIsEnabled());
+//
+//                            // Map FormDetails and apply constraint mapping
+////                            List<FormDetails> mappedFormDetails = mapListForConstraints(form.getFormDetails());
+//
+//                            formDTO.setFormDetails(mappedFormDetails.stream()
+//                                    .map(detail -> FormDetails.builder()
+//                                            .id(detail.getId())
+//                                            .index(detail.getIndex())
+//                                            .fieldLabel(detail.getFieldLabel())
+//                                            .fieldOptions(detail.getFieldOptions())
+//                                            .isRequired(detail.getIsRequired())
+//                                            .defaultValue(detail.getDefaultValue())
+//                                            .placeholder(detail.getPlaceholder())
+//                                            .fieldType(detail.getFieldType())
+//                                            .constraints(detail.getConstraints())
+//                                            .key(detail.getKey())
+//                                            .createdBy(detail.getCreatedBy())
+//                                            .createdAt(detail.getCreatedAt())
+//                                            .updatedBy(getAuthenticatedUserId())
+//                                            .updatedAt(ZonedDateTime.now())
+//                                            .build())
+//                                    .collect(Collectors.toList()));
+//
+//                            formDTO.setCreatedBy(form.getCreatedBy());
+//                            formDTO.setCreatedAt(form.getCreatedAt());
+//                            formDTO.setUpdatedBy(getAuthenticatedUserId());
+//                            formDTO.setUpdatedAt(ZonedDateTime.now());
+//
+//                            return formDTO;
+//                        })
+//
+//                        .collect(Collectors.toList());
+//
+//                response = getResponseDTO("Successfully retrieved all forms", HttpStatus.OK, formDTOList);
+//                return new ResponseEntity<>(response, HttpStatus.OK);
+//            } else {
+//                response = getResponseDTO("No record found", HttpStatus.NOT_FOUND);
+//                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+//            }
+//        } catch (ResponseStatusException e) {
+//            log.error("Exception Occured! and Message -> {} and Cause -> {}", e.getMessage(), e.getReason());
+//            response = getResponseDTO(e.getMessage(), HttpStatus.valueOf(e.getStatusCode().value()));
+//            return new ResponseEntity<>(response, HttpStatus.valueOf(e.getStatusCode().value()));
+//        } catch (Exception e) {
+//            log.error("Exception Occured! StatusCode -> {} and Cause -> {} and Message -> {}", 500, e.getCause(), e.getMessage());
+//            response = getResponseDTO(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
 
     @Override
@@ -292,68 +367,19 @@ public class FormServiceImpl implements FormService {
                 return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
             }
 
-    //    @Override
-//    @Transactional
-//    public ResponseEntity<ResponseDTO> saveForm(FormDTO formDTO) {
-//        log.info("Inside the save form method ::: Trying to save a form");
-//
-//        ResponseDTO respose;
-//        try {
-//            var form = modelMapper.map(formDTO, Form.class);
-//            List<FormDetails> formDetailsList = new ArrayList<>();
-//
-//            if (isNotNullOrEmpty(formDTO.getFormDetails())) {
-//                for (FormDetails details : formDTO.getFormDetails()) {
-//                    FormDetails formDetails = new FormDetails();
-//                    formDetails.setFieldLabel(details.getFieldLabel());
-//                    formDetails.setFieldType(details.getFieldType());
-//                    formDetails.setConstraints(details.getConstraints());
-//                    formDetails.setFieldOptions(details.getFieldOptions());
-//                    formDetails.setKey(details.getKey());
-//                    formDetails.setCreatedAt(ZonedDateTime.now());
-//                    formDetails.setCreatedBy(getAuthenticatedUserId());
-//                    formDetails.setUpdatedBy(getAuthenticatedUserId());
-//                    formDetails.setUpdatedAt(ZonedDateTime.now());
-//                    formDetailsList.add(formDetails);
-//                }
+
+//            private List<FormDetails> mapListForConstraints(List<FormDetails> res) {
+//                return res.stream()
+//                        .map(formDetails -> {
+//                            String constraintRepresentation = formDetails.getConstraints().toString();
+//                            var keyValues = Constraints.getKeyValues();
+//                            if (keyValues.containsKey(constraintRepresentation)) {
+//                                formDetails.setConstraints(keyValues.get(constraintRepresentation));
+//                            }
+//                            return formDetails;
+//                        })
+//                        .collect(Collectors.toList());
 //            }
-//
-//            form.setVersion(formDTO.getVersion());
-//            form.setFormDetails(formDetailsList);
-//            form.setCreatedBy(getAuthenticatedUserId());
-//            form.setCreatedAt(ZonedDateTime.now());
-//            form.setUpdatedBy(getAuthenticatedUserId());
-//            form.setUpdatedAt(ZonedDateTime.now());
-//
-//            // Set the forms in each form detail to maintain the bidirectional relationship
-//            for (FormDetails formDetails : formDetailsList) {
-//                formDetails.setForm(Collections.singletonList(form));
-//            }
-//
-//
-//            var record = formRepository.save(form);
-//            log.info("Saved record -> {}", record);
-//
-//            log.info("Success! statusCode -> {} and Message -> {}", HttpStatus.CREATED, record);
-//            respose = getResponseDTO("Record Saved Successfully", HttpStatus.OK, record);
-//
-//        } catch (ResponseStatusException e) {
-//            log.error("Error Occurred! statusCode -> {}, Message -> {}, Reason -> {}", e.getStatusCode(), e.getMessage(), e.getReason());
-//            respose = getResponseDTO(e.getReason(), HttpStatus.valueOf(e.getStatusCode().value()));
-//        } catch (ObjectNotValidException e) {
-//            var message = String.join("\n", e.getErrorMessages());
-//            log.info("Exception Occurred! Reason -> {}", message);
-//            respose = getResponseDTO(message, HttpStatus.BAD_REQUEST);
-//
-//        } catch (DataIntegrityViolationException e) {
-//            log.error("Exception Occurred! Message -> {} and Cause -> {}", e.getMostSpecificCause(), e.getMessage());
-//            respose = getResponseDTO(e.getMessage(), HttpStatus.BAD_REQUEST);
-//        } catch (Exception e) {
-//            log.error("Exception Occured! statusCode -> {} and Cause -> {} and Message -> {}", 500, e.getCause(), e.getMessage());
-//            respose = getResponseDTO(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//        return new ResponseEntity<>(respose, HttpStatus.valueOf(respose.getStatusCode()));
-//    }
 
 
 

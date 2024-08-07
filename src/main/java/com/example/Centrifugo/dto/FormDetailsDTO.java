@@ -23,7 +23,9 @@ public class FormDetailsDTO {
 
     private String fieldLabel;
 
-    private Map<String, Object> fieldOptions;
+//    private Map<String, Object> fieldOptions;
+
+    private List<Map<String, String>> fieldOptions;
 
     private Boolean isRequired;
 
@@ -33,7 +35,7 @@ public class FormDetailsDTO {
 
     private FieldType fieldType;
 
-    private Constraints constraints;
+    private List<Constraints> constraints;
 
     private String key;
 
@@ -46,6 +48,8 @@ public class FormDetailsDTO {
     private UUID updatedBy;
 
     private ZonedDateTime updatedAt = ZonedDateTime.now();
+
+
 
 
 

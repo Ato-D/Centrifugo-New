@@ -36,7 +36,7 @@ public class FormDetails {
 
     @Column(name = "options", columnDefinition = "jsonb")
     @org.hibernate.annotations.Type(JsonType.class)
-    private Map<String, Object> fieldOptions = new HashMap<>();
+    private List<Map<String, String>> fieldOptions;
 
     private Boolean isRequired;
 
@@ -47,8 +47,15 @@ public class FormDetails {
     @Enumerated(EnumType.STRING)
     private FieldType fieldType;
 
-    @Enumerated(EnumType.STRING)
-    private Constraints constraints;
+//    @Enumerated(EnumType.STRING)
+    @Column(name = "constraints", columnDefinition = "jsonb")
+    @org.hibernate.annotations.Type(JsonType.class)
+    private List<Constraints> constraints;
+
+//    //    @Enumerated(EnumType.STRING)
+//    @Column(name = "constraints", columnDefinition = "jsonb")
+//    @org.hibernate.annotations.Type(JsonType.class)
+//    private Object constraints;
 
     private String key;
 
