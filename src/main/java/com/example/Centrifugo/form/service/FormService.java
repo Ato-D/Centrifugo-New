@@ -18,6 +18,9 @@ public interface FormService {
 
     ResponseEntity<ResponseDTO> update(UUID id, FormDTO formDTO);
 
+    ResponseEntity<ResponseDTO> disable(UUID id, FormDTO formDTO);
+
+
 
 
 
