@@ -82,7 +82,7 @@ public class FormController {
     }
 
     @PutMapping("/{id}/disable")
-    public ResponseEntity<ResponseDTO> disableVehicleType(@RequestBody FormDTO formDTO, @PathVariable(name = "id") UUID id ){
+    public ResponseEntity<ResponseDTO> disableForm(@RequestBody FormDTO formDTO, @PathVariable(name = "id") UUID id ){
         return formService.disable(id, formDTO);
     }
 
