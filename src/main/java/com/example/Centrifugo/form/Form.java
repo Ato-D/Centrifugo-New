@@ -31,7 +31,7 @@ public class Form {
     private String name;
 
     @Column(name = "version")
-    private int version;
+    private int version = 1;
 
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinTable(

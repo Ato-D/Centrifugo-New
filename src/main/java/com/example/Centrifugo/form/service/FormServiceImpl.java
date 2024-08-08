@@ -53,6 +53,7 @@ public class FormServiceImpl implements FormService {
                             FormDTO formDTO = new FormDTO();
                             formDTO.setId(form.getId());
                             formDTO.setName(form.getName());
+                            formDTO.setVersion(form.getVersion());
                             formDTO.setIsEnabled(form.getIsEnabled());
                             formDTO.setFormDetails(form.getFormDetails().stream()
                                     .map(detail -> FormDetails.builder()
@@ -80,11 +81,13 @@ public class FormServiceImpl implements FormService {
                         })
                         .collect(Collectors.toList());
 
+                log.info("Not Found! statusCode -> {}, Cause -> {}, Message -> {}", 204, HttpStatus.NO_CONTENT, "Record Not Found");
                 response = getResponseDTO("Successfully retrieved all forms", HttpStatus.OK, formDTOList);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
+                log.info("Not Found! statusCode -> {}, Cause -> {}, Message -> {}", 404, HttpStatus.NOT_FOUND, "Record Not Found");
                 response = getResponseDTO("No record found", HttpStatus.NOT_FOUND);
-                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
             }
         } catch (ResponseStatusException e) {
             log.error("Exception Occured! and Message -> {} and Cause -> {}", e.getMessage(), e.getReason());

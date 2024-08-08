@@ -37,7 +37,7 @@ public class MessageServiceImpl implements MessageService {
     /**
      * This method is use to find all the messages saved in the db
      * @param params the query parameters we are passing
-     * @return the respose onbject and the status code
+     * @return the respose object and the status code
      */
     @Override
     public ResponseEntity<ResponseDTO> findAllMessages(Map<String, String> params) {
@@ -92,7 +92,7 @@ public class MessageServiceImpl implements MessageService {
                 return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
             }
             log.info("No record found! statusCode -> {} and Message -> {}", HttpStatus.NOT_FOUND, res);
-            response = (getResponseDTO("Not Found!", HttpStatus.NOT_FOUND));
+            response = getResponseDTO("Not Found!", HttpStatus.NOT_FOUND);
             return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
         }
         catch (ResponseStatusException e) {
@@ -114,7 +114,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public ResponseEntity<ResponseDTO> createMessage(MessageDto messageDto) {
         log.info("Inside the Save message method ::: Trying to save a message");
-        ResponseDTO respose;
+        ResponseDTO response;
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try {
             log.info("MessageDto {}",messageDto);
@@ -132,25 +132,25 @@ public class MessageServiceImpl implements MessageService {
             log.info("Message published successfully! statusCode -> {} and Message -> {}", HttpStatus.ACCEPTED, centrifge);
 
             log.info("Success! statusCode -> {} and Message -> {}", HttpStatus.CREATED, record);
-            respose = getResponseDTO("Record Saved Successfully", HttpStatus.OK, record);
+            response = getResponseDTO("Record Saved Successfully", HttpStatus.OK, record);
 
         } catch (ResponseStatusException e) {
             log.error("Error Occured! statusCode -> {}, Message -> {}, Reason -> {}", e.getStatusCode(), e.getMessage(), e.getReason());
-            respose = getResponseDTO(e.getReason(), HttpStatus.valueOf(e.getStatusCode().value()));
+            response = getResponseDTO(e.getReason(), HttpStatus.valueOf(e.getStatusCode().value()));
         } catch (ObjectNotValidException e) {
             var message = String.join("\n", e.getErrorMessages());
             log.info("Exception Occured! Reason -> {}", message);
-            respose = getResponseDTO(message, HttpStatus.BAD_REQUEST);
+            response = getResponseDTO(message, HttpStatus.BAD_REQUEST);
 
         } catch (DataIntegrityViolationException e) {
             log.error("Exception Occured! Message -> {} and Cause -> {}", e.getMostSpecificCause(), e.getMessage());
-            respose = getResponseDTO(e.getMessage(), HttpStatus.BAD_REQUEST);
+            response = getResponseDTO(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             log.error("Exception Occured! statusCode -> {} and Cause -> {} and Message -> {}", 500, e.getCause(), e.getMessage());
-            respose = getResponseDTO(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            response = getResponseDTO(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>(respose, HttpStatus.valueOf(respose.getStatusCode()));
+        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
     }
 
 
@@ -208,21 +208,14 @@ public class MessageServiceImpl implements MessageService {
         ResponseDTO response;
 
         try {
-//            boolean isAdmin = hasAdminRole(getUserRoles());
-//            if (isAdmin) {
             var existingMessage = messageRepository.findById(id);
             if (existingMessage.isPresent()) {
                 messageRepository.deleteById(id);
             }
             log.info("Success! statusCode -> {} and Message -> {}", HttpStatus.OK, existingMessage);
             response = getResponseDTO("Messages deleted successfully", HttpStatus.OK);
-//            }
 
-//        else {
-//                log.info("Not Authorized to Delete Message", HttpStatus.FORBIDDEN);
-//                response = getResponseDTO("Not Authorized to Delete Message", HttpStatus.FORBIDDEN);
-//            }
-        }
+    }
         catch (ResponseStatusException e) {
             log.error("Exception Occured! Reason -> {} and Message -> {}", e.getCause(), e.getReason());
             response = getResponseDTO(e.getMessage(), HttpStatus.valueOf(e.getStatusCode().value()));

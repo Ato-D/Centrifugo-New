@@ -9,7 +9,8 @@ public enum FieldType {
     textarea,
     signature,
     location,
-    image
+    image,
+    date
 
 
 
