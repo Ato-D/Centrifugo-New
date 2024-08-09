@@ -4,6 +4,7 @@ package com.example.Centrifugo.setup.service;
 import com.example.Centrifugo.dto.LOVDTO;
 import com.example.Centrifugo.dto.ResponseDTO;
 import com.example.Centrifugo.setup.model.LOV;
+import com.example.Centrifugo.setup.repository.LOVCategoryRepository;
 import com.example.Centrifugo.setup.repository.LOVRepository;
 import com.example.Centrifugo.utility.ObjectNotValidException;
 import lombok.AllArgsConstructor;
@@ -30,11 +31,13 @@ public class LOVServiceImpl implements LOVService{
 
     private final LOVRepository lovRepository;
 
+    private final LOVCategoryRepository lovCategoryRepository;
+
 
     /**
      * This method is use to find all the values saved in the db
      * @param params the query parameters we are passing
-     * @return the respose object and the status code
+     * @return the response object and the status code
      */
 
     public ResponseEntity<ResponseDTO> findAllValues(Map<String, String> params) {
@@ -51,8 +54,8 @@ public class LOVServiceImpl implements LOVService{
                         .map(lov -> {
                             LOVDTO lovdto = new LOVDTO();
                             lovdto.setId(lov.getId());
-                            lovdto.setName(lov.getName());
-                            lovdto.setCategoryid(lov.getCategoryId());
+                            lovdto.setSetupId(lov.getSetupId());
+                            lovdto.setCategoryId(lov.getCategoryId());
                             lovdto.setEnabled(lov.getIsEnabled());
                             lovdto.setCreatedBy(getAuthenticatedUserId());
                             lovdto.setCreatedAt(ZonedDateTime.now());
@@ -61,13 +64,11 @@ public class LOVServiceImpl implements LOVService{
                             return  lovdto;
                         })
                         .collect(Collectors.toList());
-
-                log.info("Not Found! statusCode -> {}, Cause -> {}, Message -> {}", 204, HttpStatus.NO_CONTENT, "Record Not Found");
-                response = getResponseDTO("No record found", HttpStatus.NO_CONTENT);
+                response = getResponseDTO("Successfully retrieved all values", HttpStatus.OK, lovList);
                 return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
             } else {
-                log.info("Not Found! statusCode -> {}, Cause -> {}, Message -> {}", 404, HttpStatus.NOT_FOUND, "Record Not Found");
-                response = getResponseDTO("No record found", HttpStatus.NOT_FOUND);
+                log.info("Not Found! statusCode -> {}, Cause -> {}, Message -> {}", 204, HttpStatus.NO_CONTENT, "Record Not Found");
+                response = getResponseDTO("No record found", HttpStatus.NO_CONTENT);
                 return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
             }
         } catch (ResponseStatusException e) {
@@ -91,7 +92,7 @@ public class LOVServiceImpl implements LOVService{
         log.info("Inside find Find Values by CategoryId Method::: Trying to find values by the category id -> {}", categoryId);
         ResponseDTO response;
         try {
-            var res = lovRepository.findById(categoryId);
+            var res = lovCategoryRepository.findById(categoryId);
             if (res.isPresent()) {
                 log.info("Success! statusCode -> {} and Message -> {}", HttpStatus.OK, res);
                 response = getResponseDTO("Successfully retrieved the values with the category id " + categoryId, HttpStatus.OK, res);
@@ -101,7 +102,7 @@ public class LOVServiceImpl implements LOVService{
             response = getResponseDTO("Not Found!", HttpStatus.NOT_FOUND);
             return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
 
-        }  catch (ResponseStatusException e) {
+        } catch (ResponseStatusException e) {
             log.error("Exception Occured! Reason -> {} and Message -> {}", e.getCause(), e.getReason());
             response = getResponseDTO(e.getMessage(), HttpStatus.valueOf(e.getStatusCode().value()));
         } catch (Exception e) {
@@ -124,9 +125,9 @@ public class LOVServiceImpl implements LOVService{
         ResponseDTO response;
         try {
             var res = LOV.builder()
-                    .name(lovdto.getName())
-                    .categoryId(lovdto.getCategoryid())
-                    .isEnabled(lovdto.isEnabled())
+                    .setupId(lovdto.getSetupId())
+                    .categoryId(lovdto.getCategoryId())
+                    .isEnabled(true)
                     .createdBy(getAuthenticatedUserId())
                     .createdAt(ZonedDateTime.now())
                     .updatedBy(getAuthenticatedUserId())
@@ -164,8 +165,8 @@ public class LOVServiceImpl implements LOVService{
             LOV existingValue = lovRepository.findById(id)
                     .orElseThrow(()
                             -> new ResponseStatusException(HttpStatus.NOT_FOUND, "value with Id " + id + "Does Not Exist"));
-                    existingValue.setName(lovdto.getName());
-                    existingValue.setCategoryId(lovdto.getCategoryid());
+                    existingValue.setSetupId(lovdto.getSetupId());
+                    existingValue.setCategoryId(lovdto.getCategoryId());
 
                     var record = lovRepository.save(existingValue);
             log.info("Success! statusCode -> {} and Message -> {}", HttpStatus.ACCEPTED, record);
@@ -196,7 +197,7 @@ public class LOVServiceImpl implements LOVService{
             existingValue.setUpdatedAt(ZonedDateTime.now());
 
             var record = lovRepository.save(existingValue);
-            log.info("Success! statusCode -> {} and Message -> {}", HttpStatus.OK, existingValue.getName() + " status set to " + lovdto.isEnabled());
+            log.info("Success! statusCode -> {} and Message -> {}", HttpStatus.OK, existingValue.getSetupId() + " status set to " + lovdto.isEnabled());
             response = getResponseDTO("Value updated to " + existingValue.getIsEnabled(), HttpStatus.ACCEPTED, record);
         } catch (ResponseStatusException e) {
             log.error("Exception Occurred!, Message -> {}, Cause -> {}", e.getMessage(), e.getReason());

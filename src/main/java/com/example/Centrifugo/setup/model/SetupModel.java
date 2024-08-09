@@ -2,7 +2,10 @@ package com.example.Centrifugo.setup.model;
 
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -13,43 +16,35 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "list_of_values", schema = "centrifugo")
+@Table(name = "setup_model", schema = "centrifugo")
 @Entity
-public class LOV {
+public class SetupModel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     private UUID id;
 
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "category_id")
     private UUID categoryId;
-
-    @Column(name = "setup_id")
-    private  UUID setupId;
 
     @Column(name = "is_enabled")
     private Boolean isEnabled;
 
-    @Column(name = "created_By", nullable = false)
+    @Column(name = "created_By")
     private UUID createdBy;
 
     @CreationTimestamp
     @Column(name = "created_At")
     private ZonedDateTime createdAt = ZonedDateTime.now();
 
-    @Column(name = "updated_By", nullable = false)
+    @Column(name = "updated_By")
     private UUID updatedBy;
 
     @UpdateTimestamp
     @Column(name = "updated_At")
     private ZonedDateTime updatedAt = ZonedDateTime.now();
-
-
-    @PrePersist
-    public void prePersist(){
-        this.isEnabled = true;
-    }
-
-
-
 }

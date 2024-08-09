@@ -53,13 +53,11 @@ public class LOVCategoryServiceImpl implements LOVCategoryService{
                             return lovCategoryDTO;
                         })
                         .collect(Collectors.toList());
-
-                log.info("Not Found! statusCode -> {}, Cause -> {}, Message -> {}", 204, HttpStatus.NO_CONTENT, "Record Not Found");
-                response = getResponseDTO("No record found", HttpStatus.NO_CONTENT);
+                response = getResponseDTO("Successfully retrieved all categories", HttpStatus.OK, lovCategories);
                 return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
             }else {
-                log.info("Not Found! statusCode -> {}, Cause -> {}, Message -> {}", 404, HttpStatus.NOT_FOUND, "Record Not Found");
-                response = getResponseDTO("No record found", HttpStatus.NOT_FOUND);
+                log.info("Not Found! statusCode -> {}, Cause -> {}, Message -> {}", 204, HttpStatus.NO_CONTENT, "Record Not Found");
+                response = getResponseDTO("No record found", HttpStatus.NO_CONTENT);
                 return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
             }
         } catch (ResponseStatusException e) {
@@ -116,7 +114,7 @@ public class LOVCategoryServiceImpl implements LOVCategoryService{
         try{
             var res = LOVCategory.builder()
                     .name(lovCategoryDTO.getName())
-                    .isEnabled(lovCategoryDTO.isEnabled())
+                    .isEnabled(true)
                     .createdBy(getAuthenticatedUserId())
                     .createdAt(ZonedDateTime.now())
                     .updatedBy(getAuthenticatedUserId())

@@ -1,6 +1,5 @@
 package com.example.Centrifugo.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,19 +8,20 @@ import lombok.NoArgsConstructor;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LOVDTO {
+public class SetupDTO {
 
     private UUID id;
 
-    private UUID setupId;
-
-    private boolean isEnabled;
+    private String name;
 
     private UUID categoryId;
+
+    private boolean isEnabled;
 
     private UUID createdBy;
 
@@ -30,4 +30,6 @@ public class LOVDTO {
     private UUID updatedBy;
 
     private ZonedDateTime updatedAt = ZonedDateTime.now();
+
+
 }

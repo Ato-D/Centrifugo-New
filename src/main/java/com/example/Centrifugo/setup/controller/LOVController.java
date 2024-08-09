@@ -1,11 +1,9 @@
 package com.example.Centrifugo.setup.controller;
 
 
-import com.example.Centrifugo.dto.FormDTO;
 import com.example.Centrifugo.dto.LOVDTO;
 import com.example.Centrifugo.dto.ResponseDTO;
 import com.example.Centrifugo.setup.model.LOV;
-import com.example.Centrifugo.setup.repository.LOVRepository;
 import com.example.Centrifugo.setup.service.LOVService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

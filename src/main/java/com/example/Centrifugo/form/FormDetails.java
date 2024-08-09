@@ -38,6 +38,10 @@ public class FormDetails {
     @org.hibernate.annotations.Type(JsonType.class)
     private List<Map<String, String>> fieldOptions;
 
+    @Column(name = "setup_lov", columnDefinition = "jsonb")
+    @org.hibernate.annotations.Type(JsonType.class)
+    private List<Map<String, String>> setupLov;
+
     private Boolean isRequired;
 
     private String defaultValue;
@@ -51,11 +55,6 @@ public class FormDetails {
     @Column(name = "constraints", columnDefinition = "jsonb")
     @org.hibernate.annotations.Type(JsonType.class)
     private List<Constraints> constraints;
-
-//    //    @Enumerated(EnumType.STRING)
-//    @Column(name = "constraints", columnDefinition = "jsonb")
-//    @org.hibernate.annotations.Type(JsonType.class)
-//    private Object constraints;
 
     private String key;
 
@@ -72,7 +71,6 @@ public class FormDetails {
     @CreationTimestamp
     @Column(name = "created_At")
     private ZonedDateTime createdAt = ZonedDateTime.now();
-
 
     @Column(name = "updated_by", nullable = false)
     private UUID updatedBy;

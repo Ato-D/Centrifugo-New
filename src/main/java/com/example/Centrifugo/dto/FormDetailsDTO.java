@@ -27,6 +27,8 @@ public class FormDetailsDTO {
 
     private List<Map<String, String>> fieldOptions;
 
+    private List<Map<String, String>> setupLov;
+
     private Boolean isRequired;
 
     private String defaultValue;

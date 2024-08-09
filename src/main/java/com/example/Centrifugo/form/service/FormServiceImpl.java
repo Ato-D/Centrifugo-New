@@ -60,6 +60,7 @@ public class FormServiceImpl implements FormService {
                                             .id(detail.getId())
                                             .index(detail.getIndex())
                                             .fieldLabel(detail.getFieldLabel())
+                                            .setupLov(detail.getSetupLov())
                                             .fieldOptions(detail.getFieldOptions())
                                             .isRequired(detail.getIsRequired())
                                             .defaultValue(detail.getDefaultValue())
@@ -169,6 +170,7 @@ public class FormServiceImpl implements FormService {
                         formDetails.setIndex(details.getIndex());
                         formDetails.setFieldLabel(details.getFieldLabel());
                         formDetails.setFieldOptions(details.getFieldOptions());
+                        formDetails.setSetupLov(details.getSetupLov());
                         formDetails.setIsRequired(details.getIsRequired());
                         formDetails.setDefaultValue(details.getDefaultValue());
                         formDetails.setPlaceholder(details.getPlaceholder());
@@ -260,6 +262,7 @@ public class FormServiceImpl implements FormService {
                 newFormDetails.setId(UUID.randomUUID());
                 newFormDetails.setIndex(formDetails.getIndex());
                 newFormDetails.setFieldLabel(formDetails.getFieldLabel());
+                newFormDetails.setSetupLov(formDetails.getSetupLov());
                 newFormDetails.setFieldOptions(formDetails.getFieldOptions());
                 newFormDetails.setIsRequired(formDetails.getIsRequired());
                 newFormDetails.setDefaultValue(formDetails.getDefaultValue());
